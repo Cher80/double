@@ -115,6 +115,40 @@ class KeyboardController(private val sounds: Sounds, private var resolver: Resol
                     resolver.enterOptic = false
                 }
 
+                // R reload
+                nativeEvent?.keyCode == 19 && nativeEvent.keyLocation == 1 -> {
+                    resolver.enterOptic = false
+                }
+
+                // minus on timepad
+                nativeEvent?.keyCode == 3658 && nativeEvent.keyLocation == 4 -> {
+                    resolver.globalDisable = !resolver.globalDisable
+                }
+
+                // Q
+                nativeEvent?.keyCode == 16 && nativeEvent.keyLocation == 1 -> {
+                    resolver.setQOn()
+                }
+
+                // E
+                nativeEvent?.keyCode == 18 && nativeEvent.keyLocation == 1 -> {
+                    resolver.setEOn()
+                }
+            }
+        }
+
+        override fun nativeKeyReleased(nativeEvent: NativeKeyEvent?) {
+            safePrint("nativeKeyReleased: keyChar = ${nativeEvent?.keyChar} keyCode = ${nativeEvent?.keyCode} nativeEvent.keyLocation=${nativeEvent?.keyLocation}")
+            when {
+                // Q
+                nativeEvent?.keyCode == 16 && nativeEvent.keyLocation == 1 -> {
+                    resolver.setQOff()
+                }
+
+                // E
+                nativeEvent?.keyCode == 18 && nativeEvent.keyLocation == 1 -> {
+                    resolver.setEOff()
+                }
             }
         }
     }

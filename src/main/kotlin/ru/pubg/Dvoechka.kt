@@ -26,7 +26,8 @@ class Dvoechka {
             )
 
             val mouseController = MouseController(
-                resolver = resolver
+                resolver = resolver,
+                sounds = sounds,
             )
 
             val pinger = Pinger(

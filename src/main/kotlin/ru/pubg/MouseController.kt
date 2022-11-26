@@ -9,10 +9,14 @@ import java.awt.event.InputEvent
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 
-class MouseController(private val resolver: Resolver) {
+class MouseController(private val resolver: Resolver, private val sounds: Sounds) {
 
+    val qeRadians =  (PI / 180f) * 20f
     var robot = Robot()
     var executor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
     var softwareClick = false
@@ -29,12 +33,23 @@ class MouseController(private val resolver: Resolver) {
 
 
 
+
     fun makeShot(yDelta: Int, max: Int, cur: Int) {
         softwareClick = true
         val x = MouseInfo.getPointerInfo().location.x
         val y = MouseInfo.getPointerInfo().location.y
-        safePrint("makeShot: x=$x y=$y yDelta=$yDelta max=$max cur=$cur")
-        robot.mouseMove(x, y + yDelta)
+        val sin = sin(qeRadians)
+        val cos = cos(qeRadians)
+        val xDeltaQe = (sin * yDelta *
+                when {
+                    resolver.q -> 1
+                    resolver.e -> -1
+                    else -> 0
+                }).toInt()
+        val yDeltaQe = if (resolver.q || resolver.e) (cos * yDelta).toInt() else yDelta
+        safePrint("makeShot: sin=$sin qeRadians=$qeRadians x=$x y=$y yDelta=$yDelta xDeltaQe=$xDeltaQe max=$max cur=$cur")
+
+        robot.mouseMove(x + xDeltaQe, y + yDeltaQe)
         val task = object : Runnable {
             override fun run() {
                 safePrint("makeShot: RUN ${Thread.currentThread()}")
@@ -54,7 +69,7 @@ class MouseController(private val resolver: Resolver) {
                     // Move down a little after the last shoot
                     val xAfterShot = MouseInfo.getPointerInfo().location.x
                     val yAfterShot = MouseInfo.getPointerInfo().location.y
-                    robot.mouseMove(xAfterShot, yAfterShot + yDelta / 5)
+                        //robot.mouseMove(xAfterShot, yAfterShot + yDelta / 5)
                 }
             }
         }
@@ -67,7 +82,17 @@ class MouseController(private val resolver: Resolver) {
             safePrint("nativeMousePressed: b=${e.button}  softwareClick=$softwareClick x=${e.x} y=${e.y} ")
 
             if (e.button == NativeMouseEvent.BUTTON2) {
-                resolver.enterOptic = !resolver.enterOptic
+                if (resolver.enable) {
+                    sounds.playOn()
+                }
+
+                if (resolver.dmrSelected) {
+                    resolver.enterOptic = !resolver.enterOptic
+                }
+            }
+
+            if (e.button == NativeMouseEvent.BUTTON5) {
+                resolver.buttonOnOff = !resolver.buttonOnOff
             }
 
             if (!softwareClick && resolver.enable && e.button == NativeMouseEvent.BUTTON1) {
