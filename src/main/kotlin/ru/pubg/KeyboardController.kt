@@ -81,6 +81,7 @@ class KeyboardController(private val sounds: Sounds, private var resolver: Resol
                 }
 
                 // On/off script by selecting weapon, 1 - sniper, 2 assault rifle
+                /*
                 nativeEvent?.keyCode == 2 && nativeEvent.keyLocation == 1 -> {
                     resolver.dmrSelected = true
                 }
@@ -124,6 +125,8 @@ class KeyboardController(private val sounds: Sounds, private var resolver: Resol
                 nativeEvent?.keyCode == 3658 && nativeEvent.keyLocation == 4 -> {
                     resolver.globalDisable = !resolver.globalDisable
                 }
+                */
+
 
                 // Q
                 nativeEvent?.keyCode == 16 && nativeEvent.keyLocation == 1 -> {

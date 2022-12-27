@@ -5,7 +5,7 @@ class Pinger(private val resolver: Resolver) {
         val thread = Thread {
             var i =0
             while (true) {
-                safePrint("alive ${i++} deltaY = ${resolver.deltaY} enabled = ${resolver.enable}")
+                safePrint("${Thread.currentThread().name} alive ${i++} deltaY = ${resolver.deltaY} enabled = ${resolver.enable}")
                 Thread.sleep(1900)
             }
         }

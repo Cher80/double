@@ -20,6 +20,7 @@ class Sounds {
     fun playOn() {
         clipOn.framePosition = 0
         clipOn.start()
+
     }
 
     fun playOff() {

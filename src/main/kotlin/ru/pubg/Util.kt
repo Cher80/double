@@ -10,3 +10,10 @@ fun safePrint(message: String) {
     }
     thread.start()
 }
+
+fun inThread(f: ()->Unit) {
+    val thread = Thread {
+        f.invoke()
+    }
+    thread.start()
+}

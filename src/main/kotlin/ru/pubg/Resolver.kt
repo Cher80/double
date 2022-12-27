@@ -8,7 +8,7 @@ class Resolver(private val sounds: Sounds) {
     var e = false
         private set
 
-    var deltaY = 120
+    var deltaY = 55
 
     var enable = false
         private set
