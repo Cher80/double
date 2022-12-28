@@ -18,22 +18,26 @@ class Sounds {
     }
 
     fun playOn() {
+        clipOn.stop()
         clipOn.framePosition = 0
         clipOn.start()
 
     }
 
     fun playOff() {
+        clipOn.stop()
         clipOff.framePosition = 0
         clipOff.start()
     }
 
     fun playSaved() {
+        clipOn.stop()
         clipSaved.framePosition = 0
         clipSaved.start()
     }
 
     fun playStartSave() {
+        clipOn.stop()
         startSave.framePosition = 0
         startSave.start()
     }

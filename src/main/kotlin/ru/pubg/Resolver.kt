@@ -59,11 +59,11 @@ class Resolver(private val sounds: Sounds) {
         when {
             enable && !initialEnable ->  {
                 safePrint("Now on")
-                sounds.playOn()
+                //sounds.playOn()
             }
             !enable && initialEnable ->  {
                 safePrint("Now off")
-                sounds.playOff()
+                //sounds.playOff()
             }
         }
     }

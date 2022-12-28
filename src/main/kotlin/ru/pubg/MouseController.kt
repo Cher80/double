@@ -26,9 +26,7 @@ class MouseController(private val resolver: Resolver,
         executorFixedThreadPool.submit {
             safePrint("warmUp")
         }
-        mouseJNI.mouseLeftUp()
-        mouseJNI.mouseLeftDown()
-        mouseJNI.mouseMove(1,1)
+
         //GlobalScreen.addNativeMouseMotionListener(mouseListener)
     }
 
@@ -40,8 +38,6 @@ class MouseController(private val resolver: Resolver,
 
     fun makeShot(yDelta: Int, max: Int, cur: Int) {
         softwareClick = true
-        val x = MouseInfo.getPointerInfo().location.x
-        val y = MouseInfo.getPointerInfo().location.y
         val sin = sin(qeRadians)
         val cos = cos(qeRadians)
         val xDeltaQe = (sin * yDelta *
@@ -51,22 +47,26 @@ class MouseController(private val resolver: Resolver,
                     else -> 0
                 }).toInt()
         val yDeltaQe = if (resolver.q || resolver.e) (cos * yDelta).toInt() else yDelta
-        safePrint("makeShot: sin=$sin qeRadians=$qeRadians x=$x y=$y yDelta=$yDelta xDeltaQe=$xDeltaQe yDeltaQe = $yDeltaQe max=$max cur=$cur")
-
-//        for (i in 0 until yDeltaQe) {
-//            safePrint("mouseMove: y = ${MouseInfo.getPointerInfo().location.y}")
-//                //val x = MouseInfo.getPointerInfo().location.x
-//            //val y = MouseInfo.getPointerInfo().location.y
-//            robot.mouseMove(x + xDeltaQe, MouseInfo.getPointerInfo().location.y + 3)
-//            Thread.sleep(1)
-//        }
+        Thread.sleep(60) // если уменьшать то при быстром тапе не будет двойного выстрела
         mouseJNI.mouseLeftUp()
+        Thread.sleep(10) // усли уменьшать сильный разброс после 2 выстрела
         mouseJNI.mouseMove(xDeltaQe.toLong(), yDeltaQe.toLong())
-        //Thread.sleep(20)
+        Thread.sleep(20)
         mouseJNI.mouseLeftDown()
-        Thread.sleep(20)
+        Thread.sleep(5)
         mouseJNI.mouseLeftUp()
-        Thread.sleep(20)
+        Thread.sleep(5)
+
+//        Thread.sleep(65)
+//        mouseJNI.mouseLeftUp()
+//        Thread.sleep(30)
+//        mouseJNI.mouseMove(xDeltaQe.toLong(), yDeltaQe.toLong())
+//        Thread.sleep(20) // если быстро тапнуть
+//        mouseJNI.mouseLeftDown()
+//        Thread.sleep(30)
+//        mouseJNI.mouseLeftUp()
+//        Thread.sleep(10)
+
         softwareClick = false
         if (cur < max) {
             makeShot(
@@ -84,17 +84,15 @@ class MouseController(private val resolver: Resolver,
 
             if (wParam == MouseJNI.WM_RBUTTONUP) {
 
-                inThread {
+                executorFixedThreadPool.submit {
                     safePrint("${Thread.currentThread().name} WM_RBUTTONUP")
-                    if (resolver.enable) {
-                        sounds.playOn()
-                    }
+                    if (resolver.enable) sounds.playOn()
                 }
             }
 
             if (wParam == MouseJNI.WM_MOUSEUP && mouseData == MouseJNI.WM_MOUSE_SIDE_UP) {
 
-                inThread {
+                executorFixedThreadPool.submit {
                     safePrint("${Thread.currentThread().name} WM_MOUSE_SIDE_UP")
                     sounds.playOn()
                     resolver.buttonOnOff = true
@@ -104,7 +102,7 @@ class MouseController(private val resolver: Resolver,
 
             if (wParam == MouseJNI.WM_MOUSEUP && mouseData == MouseJNI.WM_MOUSE_SIDE_DOWN) {
 
-                inThread {
+                executorFixedThreadPool.submit {
                     safePrint("${Thread.currentThread().name} WM_MOUSE_SIDE_DOWN")
                     sounds.playOff()
                     resolver.buttonOnOff = false
@@ -112,9 +110,9 @@ class MouseController(private val resolver: Resolver,
 
             }
 
-            if (!softwareClick && resolver.enable && wParam == MouseJNI.WM_LBUTTONUP) {
+            if (!softwareClick && resolver.enable && wParam == MouseJNI.WM_LBUTTONDOWN) {
 
-                inThread {
+                executorFixedThreadPool.submit {
                     safePrint("${Thread.currentThread().name} WM_LBUTTONUP deltaY=${resolver.deltaY}")
                     makeShot(
                         yDelta = resolver.deltaY,
