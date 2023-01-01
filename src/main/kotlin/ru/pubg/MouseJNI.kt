@@ -170,7 +170,7 @@ class MouseJNI {
 
                 if (nCode >= 0) {
                     if (wParam?.toInt() != WM_MOUSEMOVE && wParam?.toInt() != WM_MOUSEWHEEL) {
-                        println("${Thread.currentThread().name} callback wParam=$wParam lParam?.pt?.x=${lParam?.pt?.x} lParam?.pt?.y=${lParam?.pt?.y} mouseData = ${lParam?.mouseData}")
+                        //println("${Thread.currentThread().name} callback wParam=$wParam lParam?.pt?.x=${lParam?.pt?.x} lParam?.pt?.y=${lParam?.pt?.y} mouseData = ${lParam?.mouseData}")
                         callback?.onMouseEvent(
                             wParam = wParam?.toInt() ?: -1,
                             x = lParam?.pt?.x ?: -1,

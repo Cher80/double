@@ -9,6 +9,7 @@ import com.sun.jna.platform.win32.User32
 import com.sun.jna.platform.win32.WinDef
 import com.sun.jna.platform.win32.WinDef.DWORD
 import com.sun.jna.platform.win32.WinUser.INPUT
+import java.awt.Robot
 
 
 class Dvoechka {
@@ -29,20 +30,28 @@ class Dvoechka {
                 System.exit(1)
             }
 
+            val robot = Robot()
+            val screener = Screener(
+                robot = robot
+            )
             val mouseJNI = MouseJNI()
             val sounds = Sounds()
 
-            val resolver = Resolver(sounds = sounds)
+            val modeWeapons = true
+            val resolver = Resolver(sounds = sounds,  modeWeapons = modeWeapons)
 
             val keyboardController = KeyboardController(
                 sounds = sounds,
-                resolver = resolver
+                resolver = resolver,
+                modeWeapons = modeWeapons
             )
 
             val mouseController = MouseController(
                 resolver = resolver,
                 mouseJNI = mouseJNI,
                 sounds = sounds,
+                screener = screener,
+                useImageDetect = false
             )
 
             val pinger = Pinger(
@@ -50,13 +59,13 @@ class Dvoechka {
             )
 
 
-            mouseJNI.mouseMove(-100L,100L)
+//            mouseJNI.mouseMove(-100L,100L)
 
             //Thread.sleep(500)
           // mouseJNI.mouseLeftClick()
             mouseJNI.setMouseHook()
-            mouseJNI.mouseLeftDown()
-            mouseJNI.mouseLeftUp()
+//            mouseJNI.mouseLeftDown()
+//            mouseJNI.mouseLeftUp()
 
 //            val mouseHook =  MouseHook()
 //            mouseHook.setMouseHook()

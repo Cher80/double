@@ -20,7 +20,6 @@ dependencies {
     implementation("net.java.dev.jna:jna:5.12.1")
     implementation("net.java.dev.jna:jna-platform:5.12.1")
 
-
     api(fileTree("src/main/libs") { include("*.jar") })
 }
 

@@ -1,6 +1,8 @@
 package ru.pubg
 
-class Resolver(private val sounds: Sounds) {
+import ru.pubg.items.*
+
+class Resolver(private val sounds: Sounds, private var modeWeapons: Boolean) {
 
 
     var q = false
@@ -9,9 +11,32 @@ class Resolver(private val sounds: Sounds) {
         private set
 
     var deltaY = 55
+    var deltaYWeapon = 55
 
     var enable = false
         private set
+
+    var selectedGun = Guns.MK12
+        set(value) {
+            field = value
+            resolveEnabled()
+        }
+
+    var selectedRuchka = Ruschki.NO
+        set(value) {
+            field = value
+            resolveEnabled()
+        }
+    var selectedNasadka = Nasadki.NO
+        set(value) {
+            field = value
+            resolveEnabled()
+        }
+    var selectedScope = Scopes.X15
+        set(value) {
+            field = value
+            resolveEnabled()
+        }
 
     var globalDisable = false
 
@@ -65,6 +90,32 @@ class Resolver(private val sounds: Sounds) {
                 safePrint("Now off")
                 //sounds.playOff()
             }
+        }
+
+        val s = Presets.obvesi.get(
+            Presets.Obves(
+                guns = selectedGun,
+                nasadki = selectedNasadka,
+                ruschki = selectedRuchka,
+                scopes = selectedScope
+            )
+        )
+        println("sssssss = $s")
+        deltaYWeapon = Presets.getDeltaWeapon(
+            Presets.Obves(
+                guns = selectedGun,
+                nasadki = selectedNasadka,
+                ruschki = selectedRuchka,
+                scopes = selectedScope
+            )
+        )
+    }
+
+    fun getRealDeltaY(): Int {
+        return if (modeWeapons) {
+            deltaYWeapon
+        } else {
+            deltaY
         }
     }
 }

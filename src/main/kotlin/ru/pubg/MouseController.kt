@@ -6,17 +6,19 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
 
 class MouseController(private val resolver: Resolver,
                       private val mouseJNI: MouseJNI,
-                      private val sounds: Sounds) {
+                      private val sounds: Sounds,
+                        private val screener: Screener,
+                      private val useImageDetect: Boolean
+) {
 
     val qeRadians =  (PI / 180f) * 20f
-    //var robot = Robot()
-    var executor: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor()
     var softwareClick = false
     var executorFixedThreadPool = Executors.newFixedThreadPool(5) as ThreadPoolExecutor
 
@@ -26,8 +28,6 @@ class MouseController(private val resolver: Resolver,
         executorFixedThreadPool.submit {
             safePrint("warmUp")
         }
-
-        //GlobalScreen.addNativeMouseMotionListener(mouseListener)
     }
 
 
@@ -47,29 +47,49 @@ class MouseController(private val resolver: Resolver,
                     else -> 0
                 }).toInt()
         val yDeltaQe = if (resolver.q || resolver.e) (cos * yDelta).toInt() else yDelta
-        Thread.sleep(60) // если уменьшать то при быстром тапе не будет двойного выстрела
+        Thread.sleep(65) // если уменьшать то при быстром тапе не будет двойного выстрела
         mouseJNI.mouseLeftUp()
-        Thread.sleep(10) // усли уменьшать сильный разброс после 2 выстрела
+        Thread.sleep(80) // усли уменьшать сильный разброс после 2 выстрела
         mouseJNI.mouseMove(xDeltaQe.toLong(), yDeltaQe.toLong())
         Thread.sleep(20)
         mouseJNI.mouseLeftDown()
-        Thread.sleep(5)
+        Thread.sleep(30)
         mouseJNI.mouseLeftUp()
         Thread.sleep(5)
 
-//        Thread.sleep(65)
-//        mouseJNI.mouseLeftUp()
-//        Thread.sleep(30)
-//        mouseJNI.mouseMove(xDeltaQe.toLong(), yDeltaQe.toLong())
-//        Thread.sleep(20) // если быстро тапнуть
-//        mouseJNI.mouseLeftDown()
-//        Thread.sleep(30)
-//        mouseJNI.mouseLeftUp()
-//        Thread.sleep(10)
 
         softwareClick = false
         if (cur < max) {
             makeShot(
+                yDelta = yDelta,
+                max = max,
+                cur = cur + 1
+            )
+        }
+    }
+
+
+    fun makeShotScreenDetect(yDelta: Int, max: Int, cur: Int) {
+        softwareClick = true
+        Thread.sleep(530) // если уменьшать то при быстром тапе не будет двойного выстрела
+        mouseJNI.mouseLeftUp()
+        screener.makeScreen(2)
+        val pos = screener.compareBoth()
+        val dx = pos.first
+        val dy = pos.second / 1.59f
+        println("my dx=$dx dy=$dy ")
+        Thread.sleep(15)
+        mouseJNI.mouseMove((dx).toLong(), (dy).toLong())
+        Thread.sleep(20)
+        mouseJNI.mouseLeftDown()
+        Thread.sleep(15)
+        mouseJNI.mouseLeftUp()
+        Thread.sleep(5)
+
+        softwareClick = false
+        if (cur < max) {
+            screener.makeScreen(1)
+            makeShotScreenDetect(
                 yDelta = yDelta,
                 max = max,
                 cur = cur + 1
@@ -88,16 +108,16 @@ class MouseController(private val resolver: Resolver,
                     safePrint("${Thread.currentThread().name} WM_RBUTTONUP")
                     if (resolver.enable) sounds.playOn()
                 }
+
+
             }
 
             if (wParam == MouseJNI.WM_MOUSEUP && mouseData == MouseJNI.WM_MOUSE_SIDE_UP) {
-
                 executorFixedThreadPool.submit {
                     safePrint("${Thread.currentThread().name} WM_MOUSE_SIDE_UP")
                     sounds.playOn()
                     resolver.buttonOnOff = true
                 }
-
             }
 
             if (wParam == MouseJNI.WM_MOUSEUP && mouseData == MouseJNI.WM_MOUSE_SIDE_DOWN) {
@@ -113,14 +133,25 @@ class MouseController(private val resolver: Resolver,
             if (!softwareClick && resolver.enable && wParam == MouseJNI.WM_LBUTTONDOWN) {
 
                 executorFixedThreadPool.submit {
-                    safePrint("${Thread.currentThread().name} WM_LBUTTONUP deltaY=${resolver.deltaY}")
-                    makeShot(
-                        yDelta = resolver.deltaY,
-                        max = 1,
-                        cur = 1
-                    )
+                    safePrint("${Thread.currentThread().name} WM_LBUTTONUP deltaY=${resolver.getRealDeltaY()}")
+                    if (useImageDetect) {
+                        screener.makeScreen(1)
+                        makeShotScreenDetect(
+                            yDelta = resolver.getRealDeltaY(),
+                            max = 1,
+                            cur = 1
+                        )
+                    } else {
+                        makeShot(
+                            yDelta = resolver.getRealDeltaY(),
+                            max = 1,
+                            cur = 1
+                        )
+                    }
                 }
             }
+
+
         }
     }
 }
