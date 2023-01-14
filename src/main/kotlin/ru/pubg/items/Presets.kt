@@ -98,7 +98,7 @@ object Presets {
         }
 
         safePrint("delta15=$delta15 scopedDelta=$scopedDelta obves.scopes=${obves.scopes} obves.guns=${obves.guns} obves.nasadki=${obves.nasadki} obves.ruschki=${obves.ruschki}")
-        val verticalDelted = scopedDelta //* 0.6f
+        val verticalDelted = scopedDelta / 1.8f
         return verticalDelted.toInt()
 
 

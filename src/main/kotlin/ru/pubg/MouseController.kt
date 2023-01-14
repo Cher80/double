@@ -49,11 +49,11 @@ class MouseController(private val resolver: Resolver,
         val yDeltaQe = if (resolver.q || resolver.e) (cos * yDelta).toInt() else yDelta
         Thread.sleep(65) // если уменьшать то при быстром тапе не будет двойного выстрела
         mouseJNI.mouseLeftUp()
-        Thread.sleep(80) // усли уменьшать сильный разброс после 2 выстрела
+        Thread.sleep(30) // усли уменьшать сильный разброс после 2 выстрела
         mouseJNI.mouseMove(xDeltaQe.toLong(), yDeltaQe.toLong())
-        Thread.sleep(20)
+        Thread.sleep(10)
         mouseJNI.mouseLeftDown()
-        Thread.sleep(30)
+        Thread.sleep(20)
         mouseJNI.mouseLeftUp()
         Thread.sleep(5)
 

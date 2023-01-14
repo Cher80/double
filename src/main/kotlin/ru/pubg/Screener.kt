@@ -33,6 +33,7 @@ class Screener(private val robot: Robot) {
     val screenH = Toolkit.getDefaultToolkit().getScreenSize().height
 
     init {
+        println(System.getProperty("java.library.path"))
         System.loadLibrary("opencv_java460") // положить в C:\Windows\System32  x64/opencv_java460.dll
     }
 

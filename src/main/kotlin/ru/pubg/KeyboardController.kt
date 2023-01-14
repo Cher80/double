@@ -145,22 +145,22 @@ class KeyboardController(private val sounds: Sounds, private var resolver: Resol
                 }
                 nativeEvent?.keyCode == 3 && nativeEvent.keyLocation == 1 -> {
                     resolver.buttonOnOff = false
-                    sounds.playOff()
+                    //sounds.playOff()
                 }
 
                 nativeEvent?.keyCode == 4 && nativeEvent.keyLocation == 1 -> {
                     resolver.buttonOnOff = false
-                    sounds.playOff()
+                   // sounds.playOff()
                 }
 
                 nativeEvent?.keyCode == 5 && nativeEvent.keyLocation == 1 -> {
                     resolver.buttonOnOff = false
-                    sounds.playOff()
+                    //sounds.playOff()
                 }
 
                 nativeEvent?.keyCode == 6 && nativeEvent.keyLocation == 1 -> {
                     resolver.buttonOnOff = false
-                    sounds.playOff()
+                    //sounds.playOff()
                 }
 
 
