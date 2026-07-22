@@ -2,21 +2,21 @@ package ru.pubg
 
 import com.github.kwhat.jnativehook.GlobalScreen
 import com.github.kwhat.jnativehook.NativeHookException
-import com.sun.jna.Library
-import com.sun.jna.Native
-import com.sun.jna.Platform
 import com.sun.jna.platform.win32.User32
-import com.sun.jna.platform.win32.WinDef
-import com.sun.jna.platform.win32.WinDef.DWORD
-import com.sun.jna.platform.win32.WinUser.INPUT
+import ru.pubg.dbl.DblKeyListener
+import ru.pubg.dbl.DblResolver
+import ru.pubg.dbl.DblSounds
+import ru.pubg.dbl.DblMouseListener
+import ru.pubg.dbl.DblScreener
+import ru.pubg.optx.OptxKeyListener
+import ru.pubg.optx.OptxMouseListener
+import ru.pubg.srnr.Mode
 import java.awt.Robot
 
 
 class Dvoechka {
     companion object {
-
-
-        private var run = true
+        var mode = Mode.OPTIX
         @JvmStatic fun main(args : Array<String>) {
             safePrint("Starting")
             safePrint("User32.INSTANCE.GetSystemMetrics(User32.SM_CXSCREEN) = ${User32.INSTANCE.GetSystemMetrics(User32.SM_CXSCREEN)}")
@@ -31,46 +31,51 @@ class Dvoechka {
             }
 
             val robot = Robot()
-            val screener = Screener(
-                robot = robot
-            )
             val mouseJNI = MouseJNI()
-            val sounds = Sounds()
+            val keyboardJNI = KeyboardJNI()
 
-            val modeWeapons = true
-            val resolver = Resolver(sounds = sounds,  modeWeapons = modeWeapons)
+            when (mode) {
+                Mode.DBL -> {
+                    val dblSounds = DblSounds()
+                    val modeWeapons = true
 
-            val keyboardController = KeyboardController(
-                sounds = sounds,
-                resolver = resolver,
-                modeWeapons = modeWeapons
-            )
+                    val screener = DblScreener(
+                        robot = robot
+                    )
 
-            val mouseController = MouseController(
-                resolver = resolver,
-                mouseJNI = mouseJNI,
-                sounds = sounds,
-                screener = screener,
-                useImageDetect = false
-            )
+                    val dblResolver = DblResolver(sounds = dblSounds, modeWeapons = modeWeapons)
 
-            val pinger = Pinger(
-                resolver = resolver
-            )
+                    val dblMouseListener = DblMouseListener(
+                        mouseJNI = mouseJNI,
+                        dblResolver = dblResolver,
+                        dblSounds = dblSounds,
+                        screener = screener,
+                        useImageDetect = false
+                    )
+
+                    val dblKeyListener = DblKeyListener(
+                        dblResolver = dblResolver,
+                        dblSounds = dblSounds,
+                        modeWeapons = modeWeapons
+                    )
+
+                    mouseJNI.addListener(dblMouseListener)
+                    keyboardJNI.addListener(dblKeyListener)
+                }
+                Mode.OPTIX -> {
+                    val optxMouseListener = OptxMouseListener(
+                        keyboardJNI = keyboardJNI
+                    )
+                    val optxKeyListener = OptxKeyListener(
+                        keyboardJNI = keyboardJNI
+                    )
+                    mouseJNI.addListener(optxMouseListener)
+                    keyboardJNI.addListener(optxKeyListener)
+                }
+            }
 
 
-//            mouseJNI.mouseMove(-100L,100L)
-
-            //Thread.sleep(500)
-          // mouseJNI.mouseLeftClick()
-            mouseJNI.setMouseHook()
-//            mouseJNI.mouseLeftDown()
-//            mouseJNI.mouseLeftUp()
-
-//            val mouseHook =  MouseHook()
-//            mouseHook.setMouseHook()
-//            Thread.sleep(15 * 1000);
-//            System.exit(0);
+            //mouseJNI.setMouseHook()
         }
 
 

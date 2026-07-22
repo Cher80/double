@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version "2.3.21"
     application
 }
 
@@ -29,9 +29,16 @@ tasks.test {
     useJUnitPlatform()
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_23)
+        freeCompilerArgs.add("-Xjsr305=strict")
+    }
 }
+//tasks.withType<KotlinCompile> {
+//    kotlinOptions.jvmTarget = "1.8"
+//}
 
 application {
     mainClass.set("ru.pubg.Dvoechka")

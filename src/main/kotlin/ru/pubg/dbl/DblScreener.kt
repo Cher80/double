@@ -1,18 +1,24 @@
-package ru.pubg
+package ru.pubg.dbl
 
-import org.opencv.core.*
+import org.opencv.core.Core
+import org.opencv.core.CvType
+import org.opencv.core.Mat
+import org.opencv.core.MatOfByte
 import org.opencv.core.Point
+import org.opencv.core.Scalar
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
-import java.awt.*
+import java.awt.AlphaComposite
+import java.awt.Rectangle
+import java.awt.Robot
+import java.awt.Toolkit
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferByte
 import java.io.ByteArrayInputStream
 import java.io.File
 import javax.imageio.ImageIO
 
-
-class Screener(private val robot: Robot) {
+class DblScreener(private val robot: Robot) {
 
     companion object {
         const val SCOPE_D_X = 0
@@ -46,7 +52,12 @@ class Screener(private val robot: Robot) {
                 Rectangle(screenW / 2 + SCOPE_D_X, screenH / 2 + SCOPE_D_Y + TOP_DELTA, FIRST_SHOT_W, FIRST_SHOT_H)
             }
             2 -> {
-                Rectangle(screenW / 2  + SCOPE_D_X - SECOND_SHOT_W / 2 + SCOPE_D_Y, screenH / 2 + TOP_DELTA, SECOND_SHOT_W, SECOND_SHOT_H)
+                Rectangle(
+                    screenW / 2 + SCOPE_D_X - SECOND_SHOT_W / 2 + SCOPE_D_Y,
+                    screenH / 2 + TOP_DELTA,
+                    SECOND_SHOT_W,
+                    SECOND_SHOT_H
+                )
             }
             else -> {
                 Rectangle(0, 0, screenW, screenH)

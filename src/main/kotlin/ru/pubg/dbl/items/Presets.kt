@@ -1,4 +1,4 @@
-package ru.pubg.items
+package ru.pubg.dbl.items
 
 import ru.pubg.safePrint
 
@@ -92,7 +92,7 @@ object Presets {
 
         val scopedDelta = when (obves.scopes) {
             Scopes.X4 -> delta15 * 0.37f
-                Scopes.X6 -> delta15 * 0.51f
+            Scopes.X6 -> delta15 * 0.51f
             Scopes.X8 -> delta15 * 0.68f
             Scopes.X15 -> delta15 * 1f
         }

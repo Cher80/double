@@ -1,6 +1,5 @@
 package ru.pubg
 
-import com.sun.jna.Native
 import com.sun.jna.Platform
 import com.sun.jna.platform.win32.Kernel32
 import com.sun.jna.platform.win32.User32
@@ -10,7 +9,7 @@ import com.sun.jna.platform.win32.WinUser
 import com.sun.jna.platform.win32.WinUser.*
 
 
-class MouseJNI {
+class MouseJNI() {
     companion object {
         private const val MOUSEEVENTF_MOVE = 0x0001L
         private const val MOUSEEVENTF_LEFTDOWN = 0x0002L
@@ -35,31 +34,48 @@ class MouseJNI {
         const val WM_MOUSE_SIDE_DOWN = 65536
     }
 
+    private val listeners: MutableList<Callback> = mutableListOf()
+
     interface Callback {
-        fun onMouseEvent(wParam: Int, x: Int, y: Int, mouseData: Int, flags: Int, time: Int)
+        fun onMouseEvent(nCode: Int, wParam: WPARAM?, lParam: MSLLHOOKSTRUCT?)
     }
 
     private var thrd: Thread? = null
     private var threadFinish = true
     private var isHooked = false
     private var hhk: HHOOK? = null
-    private var mouseHook: LowLevelMouseProc? = null
+    private var mouseHook: LowLevelMouseProc = object : WinUser.LowLevelMouseProc {
+        override fun callback(nCode: Int, wParam: WPARAM?, lParam: MSLLHOOKSTRUCT?): LRESULT? {
 
-    var callback: Callback? = null
+            if (nCode >= 0) {
+
+                listeners.forEach {
+                    it.onMouseEvent(
+                        nCode = nCode,
+                        wParam = wParam,
+                        lParam = lParam
+                    )
+                }
+
+                if (threadFinish) {
+                    User32.INSTANCE.PostQuitMessage(0)
+                }
+            }
+
+            return User32.INSTANCE.CallNextHookEx(hhk, nCode, wParam, LPARAM(0))
+        }
+    }
 
     init {
         if (!Platform.isWindows()) {
             throw UnsupportedOperationException("Not supported on this platform.");
         }
-
-
-            mouseHook = hookTheMouse()
-            //Native.setProtected(true)
-
-
-
+        setMouseHook()
     }
 
+    fun addListener(listener: Callback) {
+        listeners.add(listener)
+    }
 
     fun unsetMouseHook() {
         threadFinish = true
@@ -163,30 +179,5 @@ class MouseJNI {
     }
 
 
-    private fun hookTheMouse(): LowLevelMouseProc? {
 
-        return object : WinUser.LowLevelMouseProc {
-            override fun callback(nCode: Int, wParam: WPARAM?, lParam: MSLLHOOKSTRUCT?): LRESULT? {
-
-                if (nCode >= 0) {
-                    if (wParam?.toInt() != WM_MOUSEMOVE && wParam?.toInt() != WM_MOUSEWHEEL) {
-                        //println("${Thread.currentThread().name} callback wParam=$wParam lParam?.pt?.x=${lParam?.pt?.x} lParam?.pt?.y=${lParam?.pt?.y} mouseData = ${lParam?.mouseData}")
-                        callback?.onMouseEvent(
-                            wParam = wParam?.toInt() ?: -1,
-                            x = lParam?.pt?.x ?: -1,
-                            y = lParam?.pt?.y ?: -1,
-                            mouseData = lParam?.mouseData ?: -1,
-                            flags = lParam?.flags ?: -1,
-                            time = lParam?.time ?: -1,
-                        )
-                    }
-                    if (threadFinish) {
-                        User32.INSTANCE.PostQuitMessage(0)
-                    }
-                }
-
-                return User32.INSTANCE.CallNextHookEx(hhk, nCode, wParam, LPARAM(0))
-            }
-        }
-    }
 }

@@ -1,4 +1,4 @@
-package ru.pubg.items
+package ru.pubg.dbl.items
 
 enum class Ruschki {
     VERT, LEGKAYA, NO;

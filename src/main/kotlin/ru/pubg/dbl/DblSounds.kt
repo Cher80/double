@@ -1,13 +1,13 @@
-package ru.pubg
+package ru.pubg.dbl
 
-import ru.pubg.items.Guns
-import ru.pubg.items.Nasadki
-import ru.pubg.items.Ruschki
-import ru.pubg.items.Scopes
+import ru.pubg.dbl.items.Guns
+import ru.pubg.dbl.items.Nasadki
+import ru.pubg.dbl.items.Ruschki
+import ru.pubg.dbl.items.Scopes
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
 
-class Sounds {
+class DblSounds {
     private val clipOn: Clip = AudioSystem.getClip()
     private val clipOff: Clip = AudioSystem.getClip()
     private val clipSaved: Clip = AudioSystem.getClip()

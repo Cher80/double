@@ -1,4 +1,4 @@
-package ru.pubg.items
+package ru.pubg.dbl.items
 
 enum class Scopes {
     X4, X6, X8, X15;

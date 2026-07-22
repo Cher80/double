@@ -1,8 +1,16 @@
-package ru.pubg
+package ru.pubg.dbl
 
-import ru.pubg.items.*
+import ru.pubg.dbl.items.Guns
+import ru.pubg.dbl.items.Nasadki
+import ru.pubg.dbl.items.Presets
+import ru.pubg.dbl.items.Ruschki
+import ru.pubg.dbl.items.Scopes
+import ru.pubg.safePrint
+import java.util.LinkedList
+import java.util.Timer
+import java.util.TimerTask
 
-class Resolver(private val sounds: Sounds, private var modeWeapons: Boolean) {
+class DblResolver(private val sounds: DblSounds, private var modeWeapons: Boolean) {
 
 
     var q = false
@@ -12,6 +20,9 @@ class Resolver(private val sounds: Sounds, private var modeWeapons: Boolean) {
 
     var deltaY = 55
     var deltaYWeapon = 55
+
+    private var deltaArr = LinkedList<Int>()
+    private var nowSaving = false
 
     var enable = false
         private set
@@ -53,8 +64,6 @@ class Resolver(private val sounds: Sounds, private var modeWeapons: Boolean) {
         }
     var enterOptic = false
         set(value) {
-
-
             field = value
             resolveEnabled()
         }
@@ -116,6 +125,31 @@ class Resolver(private val sounds: Sounds, private var modeWeapons: Boolean) {
             deltaYWeapon
         } else {
             deltaY
+        }
+    }
+
+    fun doSave(dig: Int) {
+        if (!nowSaving) {
+            safePrint("start save")
+            nowSaving = true
+            deltaArr.clear()
+            deltaArr.push(dig)
+            sounds.playStartSave()
+            Timer().schedule(object : TimerTask() {
+                override fun run() {
+                    nowSaving = false
+                    sounds.playSaved()
+                    deltaY = 0
+                    safePrint("deltaArr = $deltaArr")
+                    deltaArr.forEachIndexed { index, i ->
+                        val tens = Math.pow(10.0, index.toDouble()).toInt()
+                        deltaY += i * tens
+                    }
+                    safePrint("saved deltaY = ${deltaY}")
+                }
+            }, 2000)
+        } else {
+            deltaArr.push(dig)
         }
     }
 }

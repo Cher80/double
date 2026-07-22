@@ -1,4 +1,4 @@
-package ru.pubg.items
+package ru.pubg.dbl.items
 
 enum class Guns {
     MK12, MINI;
